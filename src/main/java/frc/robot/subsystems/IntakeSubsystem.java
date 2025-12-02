@@ -4,10 +4,8 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 
@@ -22,15 +20,20 @@ public class IntakeSubsystem extends SubsystemBase {
   private TalonFXSConfiguration intakeMotorConfig;
   private TalonFXConfiguration pivotMotorConfig;
 
-  private CANcoder intakeCANcoder;
-  private CANcoderConfiguration intakeCANcoderConfig;
-
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
     intakeMotor = new TalonFXS(IntakeConstants.intakeMotorId);
     pivotMotor = new TalonFX(IntakeConstants.pivotMotorId);
   }
-
+  public void rollersIntake(){
+    intakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
+  }
+  public void rollersOuttake(){
+    intakeMotor.set(-IntakeConstants.kIntakeMotorSpeed);
+  }
+  public void rollersStop(){
+    intakeMotor.set(0);
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
