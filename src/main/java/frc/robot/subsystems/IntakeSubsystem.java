@@ -4,36 +4,87 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXSConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.hardware.TalonFXS;
+import org.littletonrobotics.junction.AutoLogOutput;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-  public TalonFXS intakeMotor;
+  public TalonFX rollerMotor;
   public TalonFX pivotMotor;
 
-  private TalonFXSConfiguration intakeMotorConfig;
+  private TalonFXConfiguration rollerMotorConfig;
   private TalonFXConfiguration pivotMotorConfig;
+
+  private MedianFilter intakeFilter;
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    intakeMotor = new TalonFXS(IntakeConstants.intakeMotorId);
-    pivotMotor = new TalonFX(IntakeConstants.pivotMotorId);
+    rollerMotor = new TalonFX(IntakeConstants.kRollerMotorId);
+    pivotMotor = new TalonFX(IntakeConstants.kPivotMotorId);
+
+    intakeFilter = new MedianFilter(10);
+
+    rollerMotorConfig = new TalonFXConfiguration()
+                            .withMotorOutput(new MotorOutputConfigs()
+                                                  .withInverted(InvertedValue.Clockwise_Positive)
+                                                  .withNeutralMode(NeutralModeValue.Brake))
+                            .withCurrentLimits(new CurrentLimitsConfigs()
+                                                  .withSupplyCurrentLimit(IntakeConstants.kRollerCurrentLimit));
+
+    rollerMotor.getConfigurator().apply(rollerMotorConfig);
+
+    pivotMotorConfig = new TalonFXConfiguration()
+                            .withMotorOutput(new MotorOutputConfigs()
+                                                  .withInverted(InvertedValue.Clockwise_Positive)
+                                                  .withNeutralMode(NeutralModeValue.Brake))
+                            .withCurrentLimits(new CurrentLimitsConfigs()
+                                                  .withSupplyCurrentLimit(IntakeConstants.kPivotCurrentLimit));
+    pivotMotor.getConfigurator().apply(pivotMotorConfig);
   }
-  public void rollersIntake(){
-    intakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
+
+  public void intakeIn(){
+    rollerMotor.set(IntakeConstants.kRollerMotorSpeed);
   }
-  public void rollersOuttake(){
-    intakeMotor.set(-IntakeConstants.kIntakeMotorSpeed);
+
+  public void intakeOut(){
+    rollerMotor.set(-IntakeConstants.kRollerMotorSpeed);
   }
-  public void rollersStop(){
-    intakeMotor.set(0);
+
+  public void intakeStop(){
+    rollerMotor.set(0);
   }
+
+
+  
+
+
+  @AutoLogOutput
+  public double getIntakeVelocity(){
+    return rollerMotor.getVelocity().getValueAsDouble();
+  }
+
+  @AutoLogOutput
+  public double getIntakeSupplyCurrent(){
+    return rollerMotor.getSupplyCurrent().getValueAsDouble();
+  }
+
+  @AutoLogOutput
+  public double getIntakeStatorCurrent(){
+    return rollerMotor.getStatorCurrent().getValueAsDouble();
+  }
+
+
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

@@ -7,7 +7,12 @@ package frc.robot;
 /** Add your docs here. */
 public final class Constants {
     public static class IntakeConstants {
-        public static final int intakeMotorId = 0; //not actual id
-        public static final int pivotMotorId = 0; //not actual id
+        public static final int kRollerMotorId = 0; //not actual id
+        public static final int kPivotMotorId = 0; //not actual id
+
+        public static final int kRollerCurrentLimit = 15;
+        public static final int kPivotCurrentLimit = 15;
+
+        public static final int kRollerMotorSpeed = 1;
     }
 }
